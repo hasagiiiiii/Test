@@ -14,7 +14,7 @@ function App() {
   const [peerInRooms, setPeerInRoom] = useState({}); // Object lưu trữ peer connection by userId
   const [shareScreenTrack, setShareScreenTrack] = React.useState(null);
   useEffect(() => {
-    const newSocket = io.connect("http://localhost:5000", {
+    const newSocket = io.connect("https://backend-ver-trugn.vercel.app/", {
       // connect to socket Server
       transports: ["websocket"],
     });
@@ -94,7 +94,7 @@ function App() {
   },[peerScreen,peer,socket,myPeerID,shareScreenTrack])
   const handleCreateRoom = () => {
     const myPeer = new Peer({
-      host: '0.peerjs.com',
+      host: 'https://backend-ver-trugn.vercel.app/',
       port:443, // Sử dụng cho HTTPS
       secure:true, // Bat HTTPS
       path: '/'
@@ -116,7 +116,7 @@ function App() {
   };
   const handleJoinRoom = () => {
     const myPeer = new Peer({
-      host: '0.peerjs.com',
+      host: 'https://backend-ver-trugn.vercel.app/',
       port:443, // Sử dụng cho HTTPS
       secure:true, // Bat HTTPS
       path: '/'
@@ -273,10 +273,10 @@ function App() {
   };
   const hanldeShareScreen = async () => {
     const peerStream = new Peer({
-      host: '0.peerjs.com',
+      host: 'https://backend-ver-trugn.vercel.app/',
       port:443, // Sử dụng cho HTTPS
       secure:true, // Bat HTTPS
-      path: '/'
+      path: '/peerjs'
     }); // Tạo và kết nối tới Peer
     setPeerScreen(peerStream)
     peerStream.on("open",async (id)=>{
