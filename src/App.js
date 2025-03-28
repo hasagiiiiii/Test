@@ -15,11 +15,9 @@ function App() {
   const [peerScreen, setPeerScreen] = useState(null);
   const [isRoom, setIsRoom] = useState(false);
   const [toggleMic, setToggleMic] = useState(false);
-  const [toggleCamera, setToggleCamera] = useState(false);
   const VideoRef = useRef({}); //Object lưu trữ tài liệu video theo userId
   const [peerInRooms, setPeerInRoom] = useState({}); // Object lưu trữ peer connection by userId
   const [shareScreenTrack, setShareScreenTrack] = React.useState(null);
-  const [fullScreen, setFullScreen] = React.useState();
   useEffect(() => {
     const newSocket = io.connect("http://trendyt.site:5000/", {
       // connect to socket Server
