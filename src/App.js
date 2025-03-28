@@ -69,7 +69,7 @@ function App() {
     }
   }, []);
   useEffect(() => {
-    const newSocket = io.connect("http://trendyt.site:5000/", {
+    const newSocket = io.connect("https://backend-ver-cel-t8ln.vercel.app/", {
       // connect to socket Server
       transports: ["websocket"],
     });
