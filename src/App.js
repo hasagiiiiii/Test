@@ -18,6 +18,56 @@ function App() {
   const VideoRef = useRef({}); //Object lưu trữ tài liệu video theo userId
   const [peerInRooms, setPeerInRoom] = useState({}); // Object lưu trữ peer connection by userId
   const [shareScreenTrack, setShareScreenTrack] = React.useState(null);
+  const connectToNewUser = React.useCallback((userId, stream, peer) => {
+    if (userId && !peerInRooms[userId]) {
+      const call = peer.call(userId, stream);
+      const video = document.createElement("video");
+      call.on("stream", (userVideoStream) => {
+        if (!VideoRef.current[userId]) {
+          addVideoStream(video, userVideoStream, userId);
+          VideoRef.current[userId] = userVideoStream;
+        }
+      });
+      call.on("close", () => {
+        handleCallClose(userId);
+      });
+      console.log("peerConnection", call.peerConnection);
+      if (call.peerConnection) {
+        setPeerInRoom((prePeer) => ({
+          ...prePeer,
+          [userId]: {
+            call,
+            peerConnection: call.peerConnection,
+            senders: call.peerConnection.getSenders(),
+          }, // Lưu cả `call` và `peerConnection`
+        }));
+      } else {
+        console.error(`PeerConnection not found for user ${userId}`);
+      }
+    } else {
+      console.error(`Invalid userId: ${userId}`);
+    }
+  }, []);
+
+  const UserShareScreen = React.useCallback((userId, peer, stream) => {
+    console.log("userID:", userId);
+    console.log("stream", stream);
+    if (userId && peer && peer.call) {
+      const call = peer.call(userId, stream);
+      console.log(call);
+      call.on("stream", (userVideoStream) => {
+        const video = document.createElement("video");
+        console.log("Stream In ShareScreen", userVideoStream);
+        if (!VideoRef.current[userId]) {
+          addVideoStream(video, userVideoStream, userId);
+          VideoRef.current[userId] = userVideoStream;
+        }
+      });
+      call.on("close", () => {
+        handleCallClose(userId);
+      });
+    }
+  }, []);
   useEffect(() => {
     const newSocket = io.connect("http://trendyt.site:5000/", {
       // connect to socket Server
@@ -80,7 +130,7 @@ function App() {
         }
       });
     }
-  }, [myStream, peer, socket, myPeerID]);
+  }, [myStream, peer, socket, myPeerID, connectToNewUser]);
   useEffect(() => {
     if (socket) {
       socket.on("shareScreenInRoom", (idUser) => {
@@ -95,7 +145,15 @@ function App() {
         }
       });
     }
-  }, [peerScreen, peer, socket, myPeerID, shareScreenTrack]);
+  }, [
+    peerScreen,
+    peer,
+    socket,
+    myPeerID,
+    shareScreenTrack,
+    UserShareScreen,
+    peerInRooms,
+  ]);
 
   const ViewFullScreen = (getUserID) => {
     const userID = getUserID();
@@ -201,55 +259,7 @@ function App() {
       });
     });
   };
-  const connectToNewUser = (userId, stream, peer) => {
-    if (userId && !peerInRooms[userId]) {
-      const call = peer.call(userId, stream);
-      const video = document.createElement("video");
-      call.on("stream", (userVideoStream) => {
-        if (!VideoRef.current[userId]) {
-          addVideoStream(video, userVideoStream, userId);
-          VideoRef.current[userId] = userVideoStream;
-        }
-      });
-      call.on("close", () => {
-        handleCallClose(userId);
-      });
-      console.log("peerConnection", call.peerConnection);
-      if (call.peerConnection) {
-        setPeerInRoom((prePeer) => ({
-          ...prePeer,
-          [userId]: {
-            call,
-            peerConnection: call.peerConnection,
-            senders: call.peerConnection.getSenders(),
-          }, // Lưu cả `call` và `peerConnection`
-        }));
-      } else {
-        console.error(`PeerConnection not found for user ${userId}`);
-      }
-    } else {
-      console.error(`Invalid userId: ${userId}`);
-    }
-  };
-  const UserShareScreen = (userId, peer, stream) => {
-    console.log("userID:", userId);
-    console.log("stream", stream);
-    if (userId && peer && peer.call) {
-      const call = peer.call(userId, stream);
-      console.log(call);
-      call.on("stream", (userVideoStream) => {
-        const video = document.createElement("video");
-        console.log("Stream In ShareScreen", userVideoStream);
-        if (!VideoRef.current[userId]) {
-          addVideoStream(video, userVideoStream, userId);
-          VideoRef.current[userId] = userVideoStream;
-        }
-      });
-      call.on("close", () => {
-        handleCallClose(userId);
-      });
-    }
-  };
+
   const addVideoStream = (video, stream, userId) => {
     // video.srcObject = stream;
     // video.addEventListener("loadedmetadata", () => {
