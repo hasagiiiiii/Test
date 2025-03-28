@@ -69,7 +69,7 @@ function App() {
     }
   }, []);
   useEffect(() => {
-    const newSocket = io.connect("https://backend-ver-cel-t8ln.vercel.app/", {
+    const newSocket = io.connect("https://backendvercel-ny50.onrender.com/", {
       // connect to socket Server
       transports: ["websocket"],
     });
