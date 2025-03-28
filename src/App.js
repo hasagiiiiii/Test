@@ -23,10 +23,10 @@ function App() {
       const call = peer.call(userId, stream);
       const video = document.createElement("video");
       call.on("stream", (userVideoStream) => {
-        if (!VideoRef.current[userId]) {
-          addVideoStream(video, userVideoStream, userId);
-          VideoRef.current[userId] = userVideoStream;
-        }
+        // if (!VideoRef.current[userId]) {
+        addVideoStream(video, userVideoStream, userId);
+        VideoRef.current[userId] = userVideoStream;
+        // }
       });
       call.on("close", () => {
         handleCallClose(userId);
@@ -69,7 +69,7 @@ function App() {
     }
   }, []);
   useEffect(() => {
-    const newSocket = io.connect("https://backendvercel-ny50.onrender.com/", {
+    const newSocket = io.connect("https://backendvercel-6lr3.onrender.com", {
       // connect to socket Server
       transports: ["websocket"],
     });
