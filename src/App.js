@@ -20,30 +20,32 @@ function App() {
   const [shareScreenTrack, setShareScreenTrack] = React.useState(null);
   const connectToNewUser = React.useCallback((userId, stream, peer) => {
     if (userId && !peerInRooms[userId]) {
-      const call = peer.call(userId, stream);
-      const video = document.createElement("video");
-      call.on("stream", (userVideoStream) => {
-        // if (!VideoRef.current[userId]) {
-        addVideoStream(video, userVideoStream, userId);
-        VideoRef.current[userId] = userVideoStream;
-        // }
-      });
-      call.on("close", () => {
-        handleCallClose(userId);
-      });
-      console.log("peerConnection", call.peerConnection);
-      if (call.peerConnection) {
-        setPeerInRoom((prePeer) => ({
-          ...prePeer,
-          [userId]: {
-            call,
-            peerConnection: call.peerConnection,
-            senders: call.peerConnection.getSenders(),
-          }, // Lưu cả `call` và `peerConnection`
-        }));
-      } else {
-        console.error(`PeerConnection not found for user ${userId}`);
-      }
+      setTimeout(() => {
+        const call = peer.call(userId, stream);
+        const video = document.createElement("video");
+        call.on("stream", (userVideoStream) => {
+          // if (!VideoRef.current[userId]) {
+          addVideoStream(video, userVideoStream, userId);
+          VideoRef.current[userId] = userVideoStream;
+          // }
+        });
+        call.on("close", () => {
+          handleCallClose(userId);
+        });
+        console.log("peerConnection", call.peerConnection);
+        if (call.peerConnection) {
+          setPeerInRoom((prePeer) => ({
+            ...prePeer,
+            [userId]: {
+              call,
+              peerConnection: call.peerConnection,
+              senders: call.peerConnection.getSenders(),
+            }, // Lưu cả `call` và `peerConnection`
+          }));
+        } else {
+          console.error(`PeerConnection not found for user ${userId}`);
+        }
+      }, 1000);
     } else {
       console.error(`Invalid userId: ${userId}`);
     }
